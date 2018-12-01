@@ -4,29 +4,52 @@ public class PlayerScript : MonoBehaviour {
 
     private int xPos;
     private int yPos;
-    private PlayerPhysicsScript playerPhysics;
 
-    private bool isDashing;
-    private int dashIntervalLength = 1;
-    private const int numDashIntervals = 100;
+
+    // Player Phyisics Variables
+    private const float PLAYER_GRAVITY = 0.01f;
+    private const int TERMINAL_VELOCITY = 1;
+    private float playerFallingSpeed;
+    private bool gravityPaused;
+    private bool isGravityInverted;
+
+    public bool isDashing;
+    private int dashIntervalLength = 2;
+    private const int numDashIntervals = 50;
     private int numIntervalsDashed;
+    private KeyCode jumpKeyCode = KeyCode.Space;
+    private KeyCode altJump = KeyCode.W;
+    private KeyCode moveRightKeyCode = KeyCode.D;
+    private KeyCode moveLeftKeyCode = KeyCode.A;
+    private KeyCode fallDownKeyCode = KeyCode.S;
+    private KeyCode dashKeyCode = KeyCode.LeftShift;
+    private float playerMoveX = 0;
 
-
-    void Start() {
+    void Awake() {
         xPos = 0;
         yPos = 0;
         isDashing = false;
-        playerPhysics = new PlayerPhysicsScript(this);
-    }
-    public void changePlayerY(int deltaY)
-    {
-        yPos += deltaY;
+        playerFallingSpeed = 0f;
+        gravityPaused = false;
+        isGravityInverted = false;
     }
     private void playerDash()
     {
-        playerPhysics.pausePlayerGravity();
+        gravityPaused = true;
         numIntervalsDashed = 0;
         isDashing = true;
+    }
+    private void playerJump()
+    {
+        float playerJumpStrength = 0.4f;
+        gravityPaused = false;
+        if(isGravityInverted)
+        {
+            playerFallingSpeed = -playerJumpStrength;
+        } else
+        {
+            playerFallingSpeed = playerJumpStrength;
+        }
     }
     private void FixedUpdate()
     {
@@ -39,12 +62,61 @@ public class PlayerScript : MonoBehaviour {
             } else
             {
                 isDashing = false;
-                playerPhysics.unpausePlayerGravity();
+                gravityPaused = false;
             }
+        }
+        if (!gravityPaused)
+        {
+            if (isGravityInverted)
+            {
+                if (playerFallingSpeed < TERMINAL_VELOCITY)
+                {
+                    playerFallingSpeed += PLAYER_GRAVITY;
+                }
+            }
+            else
+            {
+                if (playerFallingSpeed > -TERMINAL_VELOCITY)
+                {
+                    playerFallingSpeed -= PLAYER_GRAVITY;
+                }
+            }
+        }
+        Vector2 moveVector = new Vector2(playerMoveX, playerFallingSpeed);
+        transform.Translate(moveVector);
+        Vector2 start = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
+        RaycastHit2D hit = Physics2D.Raycast(start, Vector2.down, .05f);
+        if (hit.collider != null && playerFallingSpeed != 0)
+        {
+            gravityPaused = true;
+            playerFallingSpeed = 0;
         }
     }
     // Update is called once per frame
     void Update () {
-		
-	}
+		if(Input.GetKeyDown(jumpKeyCode) || Input.GetKeyDown(altJump))
+        {
+            playerJump();
+        }
+        if (Input.GetKeyDown(moveRightKeyCode))
+        {
+            playerMoveX = .02f;
+        }
+        if (Input.GetKeyDown(moveLeftKeyCode))
+        {
+            playerMoveX = -.02f;
+        }
+        if (Input.GetKeyDown(moveLeftKeyCode) && Input.GetKeyDown(moveRightKeyCode))
+        {
+            playerMoveX = 0;
+        }
+        if (Input.GetKeyDown(fallDownKeyCode))
+        {
+
+        }
+        if (Input.GetKeyDown(dashKeyCode))
+        {
+            playerDash();
+        }
+    }
 }
