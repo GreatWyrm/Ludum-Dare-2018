@@ -28,6 +28,10 @@ public class PlayerScript : MonoBehaviour {
     private KeyCode dashKeyCode = KeyCode.LeftShift;
     private float playerMoveX = 0;
 
+    // private boolean touchingVertical() {
+       
+    // }
+
     void Awake() {
         xPos = 0;
         yPos = 0;
@@ -77,15 +81,17 @@ public class PlayerScript : MonoBehaviour {
                 }
         }
 
-        Vector2 moveVector = new Vector2(playerMoveX, playerFallingSpeed);
-        transform.Translate(moveVector);
-        Vector2 start = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
+         Vector2 start = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
         RaycastHit2D hit = Physics2D.Raycast(start, Vector2.down, .05f);
         if (hit.collider != null && playerFallingSpeed != 0)
         {
             gravityPaused = true;
             playerFallingSpeed = 0;
         }
+
+        Vector3 moveVector = new Vector3(playerMoveX, playerFallingSpeed, 0.0f);
+        transform.Translate(moveVector);
+        
     }
     // Update is called once per frame
     void Update () {
