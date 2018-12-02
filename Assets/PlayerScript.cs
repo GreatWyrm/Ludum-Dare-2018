@@ -94,10 +94,12 @@ public class PlayerScript : MonoBehaviour {
         if (Input.GetKey(moveRightKeyCode))
         {
             playerMoveX = horizontalSpeed;
+            GetComponentInChildren<SpriteRenderer>().flipX = true;
         }
         if (Input.GetKey(moveLeftKeyCode))
         {
             playerMoveX = -horizontalSpeed;
+            GetComponentInChildren<SpriteRenderer>().flipX = false;
         }
         if (Input.GetKey(moveLeftKeyCode) && Input.GetKey(moveRightKeyCode))
         {
