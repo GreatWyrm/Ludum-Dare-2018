@@ -7,8 +7,11 @@ public class PlayerScript : MonoBehaviour {
 
 
     // Player Phyisics Variables
-    private const float PLAYER_GRAVITY = 0.01f;
-    private const int TERMINAL_VELOCITY = 1;
+    public float gravity = 0.01f;
+    public float terminalVelocity = 1.0f;
+    public float horizontalSpeed = 0.2f;
+
+
     private float playerFallingSpeed;
     private bool gravityPaused;
     private bool isGravityInverted;
@@ -31,8 +34,9 @@ public class PlayerScript : MonoBehaviour {
         isDashing = false;
         playerFallingSpeed = 0f;
         gravityPaused = false;
-        isGravityInverted = false;
     }
+
+    
     private void playerDash()
     {
         gravityPaused = true;
@@ -67,21 +71,12 @@ public class PlayerScript : MonoBehaviour {
         }
         if (!gravityPaused)
         {
-            if (isGravityInverted)
-            {
-                if (playerFallingSpeed < TERMINAL_VELOCITY)
+                if (Mathf.Abs(playerFallingSpeed) < terminalVelocity)
                 {
-                    playerFallingSpeed += PLAYER_GRAVITY;
+                    playerFallingSpeed += -gravity;
                 }
-            }
-            else
-            {
-                if (playerFallingSpeed > -TERMINAL_VELOCITY)
-                {
-                    playerFallingSpeed -= PLAYER_GRAVITY;
-                }
-            }
         }
+
         Vector2 moveVector = new Vector2(playerMoveX, playerFallingSpeed);
         transform.Translate(moveVector);
         Vector2 start = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
@@ -100,11 +95,11 @@ public class PlayerScript : MonoBehaviour {
         }
         if (Input.GetKeyDown(moveRightKeyCode))
         {
-            playerMoveX = .02f;
+            playerMoveX = horizontalSpeed;
         }
         if (Input.GetKeyDown(moveLeftKeyCode))
         {
-            playerMoveX = -.02f;
+            playerMoveX = -horizontalSpeed;
         }
         if (Input.GetKeyDown(moveLeftKeyCode) && Input.GetKeyDown(moveRightKeyCode))
         {
