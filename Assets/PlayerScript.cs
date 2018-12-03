@@ -55,7 +55,7 @@ public class PlayerScript : MonoBehaviour {
         if (jumpsLeft > 0)
         {
             GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
-            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 10f), ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 13f), ForceMode2D.Impulse);
             jumpsLeft--;
         }
     }
@@ -70,8 +70,8 @@ public class PlayerScript : MonoBehaviour {
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // We will have to do an if/else for gravity
-        Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
-        RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.125f);
+        Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
+        RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
         if(detectGround.collider != null)
         {
             jumpsLeft = 2;
@@ -83,13 +83,13 @@ public class PlayerScript : MonoBehaviour {
     void Update () {
 		if(Input.GetKeyDown(jumpKeyCode) || Input.GetKeyDown(altJump))
         {
-            Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
-            RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.125f);
+            Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
+            RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
             if (detectGround.collider != null)
             {
                 jumpsLeft = 2;
             }
-                playerJump();
+            playerJump();
         }
         if (Input.GetKey(moveRightKeyCode))
         {
@@ -107,8 +107,8 @@ public class PlayerScript : MonoBehaviour {
         }
         if (Input.GetKey(fallDownKeyCode))
         {
-            Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<Collider2D>().bounds.extents.y);
-            RaycastHit2D detectGlassPlatform = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.125f, LayerMask.GetMask("Glass Platform"));
+            Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
+            RaycastHit2D detectGlassPlatform = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f, LayerMask.GetMask("Glass Platform"));
             if(detectGlassPlatform.collider != null)
             {
                 Physics2D.IgnoreLayerCollision(2, 8, true);
@@ -137,7 +137,7 @@ public class PlayerScript : MonoBehaviour {
             }
             else
             {
-                GetComponent<Rigidbody2D>().gravityScale = 1;
+                GetComponent<Rigidbody2D>().gravityScale = 1.5f;
                 isDashing = false;
             }
         }
