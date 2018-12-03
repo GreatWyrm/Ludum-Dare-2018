@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class PlayerScript : MonoBehaviour {
+public class PlayerScript : MonoBehaviour
+{
     private float horizontalSpeed = 0.12f;
 
 
@@ -30,7 +31,8 @@ public class PlayerScript : MonoBehaviour {
 
     public AudioClip sprintSuccessSound, sprintFailureSound, teleSuccessSound, teleFailureSound;
 
-    void Awake() {
+    void Awake()
+    {
         isDashing = false;
         jumpsLeft = 2;
         isGravityInverted = false;
@@ -42,42 +44,49 @@ public class PlayerScript : MonoBehaviour {
         isFacingRight = true;
     }
 
-    
+
     private void playerDash()
     {
-        if(canDash && canDashCooldown)
-        {   
-            if(isFacingRight)
-                {
-                    dashIntervalLength = 0.8f;
-                } else
-                {
-                    dashIntervalLength = -0.8f;
-                }
-            if (hasDashAbility) {
+        if (canDash && canDashCooldown)
+        {
+            if (isFacingRight)
+            {
+                dashIntervalLength = 0.8f;
+            }
+            else
+            {
+                dashIntervalLength = -0.8f;
+            }
+            if (hasDashAbility)
+            {
                 GetComponent<AudioSource>().PlayOneShot(sprintSuccessSound);
                 GetComponent<Rigidbody2D>().gravityScale = 0;
                 numIntervalsDashed = 0;
                 isDashing = true;
                 canDash = false;
                 canDashCooldown = false;
-                StartCoroutine("dashCooldown"); 
-            } else if (hasTeleportAbility) {
+                StartCoroutine("dashCooldown");
+            }
+            else if (hasTeleportAbility)
+            {
                 dashIntervalLength *= 7;
                 Vector2 raycastOrigin = new Vector2(transform.position.x + dashIntervalLength, transform.position.y + GetComponent<BoxCollider2D>().bounds.extents.y);
                 RaycastHit2D canTeleport = Physics2D.Raycast(raycastOrigin, Vector2.right, 0.8f);
-                if (canTeleport.collider == null) {
+                if (canTeleport.collider == null)
+                {
                     GetComponent<AudioSource>().PlayOneShot(teleSuccessSound);
-                    transform.Translate(new Vector3(dashIntervalLength, 0f,0f));
+                    transform.Translate(new Vector3(dashIntervalLength, 0f, 0f));
                     canDash = false;
                     canDashCooldown = false;
                     StartCoroutine("dashCooldown");
-                } else {
+                }
+                else
+                {
                     GetComponent<AudioSource>().PlayOneShot(teleFailureSound);
                 }
-                
+
             }
-            
+
         }
     }
 
@@ -96,7 +105,8 @@ public class PlayerScript : MonoBehaviour {
         if (isGravityInverted)
         {
             GetComponent<Rigidbody2D>().gravityScale = 1.5f;
-        } else
+        }
+        else
         {
             GetComponent<Rigidbody2D>().gravityScale = -1.5f;
         }
@@ -104,18 +114,41 @@ public class PlayerScript : MonoBehaviour {
     }
     private void FixedUpdate()
     {
-        if(!isDashing)
+        if (!isDashing)
         {
             Vector3 moveVector = new Vector3(playerMoveX, 0, 0);
+
             transform.Translate(moveVector);
         }
+        if(isGravityInverted)
+        {
+            if (GetComponent<Rigidbody2D>().velocity.y < 0 || timeNoCollideWithGlass > 0)
+            {
+                Physics2D.IgnoreLayerCollision(2, 8, true);
+            }
+            else
+            {
+                Physics2D.IgnoreLayerCollision(2, 8, false);
+            }
+        } else
+        {
+            if (GetComponent<Rigidbody2D>().velocity.y > 0 || timeNoCollideWithGlass > 0)
+            {
+                Physics2D.IgnoreLayerCollision(2, 8, true);
+            }
+            else
+            {
+                Physics2D.IgnoreLayerCollision(2, 8, false);
+            }
+        }
+        
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // We will have to do an if/else for gravity
         Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
         RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
-        if(detectGround.collider != null)
+        if (detectGround.collider != null)
         {
             jumpsLeft = 2;
             canDash = true;
@@ -123,10 +156,11 @@ public class PlayerScript : MonoBehaviour {
 
     }
     // Update is called once per frame
-    void Update () {
-		if(Input.GetKeyDown(jumpKeyCode) || Input.GetKeyDown(altJump))
+    void Update()
+    {
+        if (Input.GetKeyDown(jumpKeyCode) || Input.GetKeyDown(altJump))
         {
-            if(hasJumpAbility)
+            if (hasJumpAbility)
             {
                 Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
                 RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
@@ -135,7 +169,8 @@ public class PlayerScript : MonoBehaviour {
                     jumpsLeft = 2;
                 }
                 playerJump();
-            } else
+            }
+            else
             {
                 // GRAVITY INVERT
             }
@@ -160,9 +195,9 @@ public class PlayerScript : MonoBehaviour {
         {
             Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
             RaycastHit2D detectGlassPlatform = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f, LayerMask.GetMask("Glass Platform"));
-            if(detectGlassPlatform.collider != null)
+            if (detectGlassPlatform.collider != null)
             {
-                Physics2D.IgnoreLayerCollision(2, 8, true);
+
                 timeNoCollideWithGlass = 30;
             }
         }
@@ -171,7 +206,7 @@ public class PlayerScript : MonoBehaviour {
             playerDash();
 
         }
-        if(Input.GetKeyUp(moveRightKeyCode) && playerMoveX == horizontalSpeed)
+        if (Input.GetKeyUp(moveRightKeyCode) && playerMoveX == horizontalSpeed)
         {
             playerMoveX = 0;
         }
@@ -193,12 +228,9 @@ public class PlayerScript : MonoBehaviour {
                 isDashing = false;
             }
         }
-        if(timeNoCollideWithGlass > 0)
+        if (timeNoCollideWithGlass > 0)
         {
             timeNoCollideWithGlass--;
-        } else if(timeNoCollideWithGlass == 0)
-        {
-            Physics2D.IgnoreLayerCollision(2, 8, false);
         }
     }
     IEnumerator dashCooldown()
