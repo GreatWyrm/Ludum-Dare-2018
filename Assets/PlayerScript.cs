@@ -115,7 +115,7 @@ public class PlayerScript : MonoBehaviour {
                 playerJump();
             } else
             {
-
+                // GRAVITY INVERT
             }
         }
         if (Input.GetKey(moveRightKeyCode))
