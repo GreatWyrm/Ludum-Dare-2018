@@ -12,6 +12,7 @@ public class PlayerScript : MonoBehaviour {
     private bool canDash;
     private bool canDashCooldown;
     private bool hasDashAbility;
+    private bool hasTeleportAbility;
     private bool hasJumpAbility;
     private bool isLanded;
     private int jumpsLeft;
@@ -27,6 +28,7 @@ public class PlayerScript : MonoBehaviour {
     private float playerMoveX = 0;
     private float timeNoCollideWithGlass;
 
+    public AudioClip sprintSuccessSound, sprintFailureSound, teleSuccessSound, teleFailureSound;
 
     void Awake() {
         isDashing = false;
@@ -34,7 +36,8 @@ public class PlayerScript : MonoBehaviour {
         isGravityInverted = false;
         canDash = true;
         canDashCooldown = true;
-        hasDashAbility = true;
+        hasDashAbility = false;
+        hasTeleportAbility = true;
         hasJumpAbility = true;
         isFacingRight = true;
     }
@@ -42,23 +45,42 @@ public class PlayerScript : MonoBehaviour {
     
     private void playerDash()
     {
-        if(canDash && canDashCooldown && hasDashAbility)
-        {
+        if(canDash && canDashCooldown)
+        {   
             if(isFacingRight)
-            {
-                dashIntervalLength = 0.8f;
-            } else
-            {
-                dashIntervalLength = -0.8f;
+                {
+                    dashIntervalLength = 0.8f;
+                } else
+                {
+                    dashIntervalLength = -0.8f;
+                }
+            if (hasDashAbility) {
+                GetComponent<AudioSource>().PlayOneShot(sprintSuccessSound);
+                GetComponent<Rigidbody2D>().gravityScale = 0;
+                numIntervalsDashed = 0;
+                isDashing = true;
+                canDash = false;
+                canDashCooldown = false;
+                StartCoroutine("dashCooldown"); 
+            } else if (hasTeleportAbility) {
+                dashIntervalLength *= 7;
+                Vector2 raycastOrigin = new Vector2(transform.position.x + dashIntervalLength, transform.position.y + GetComponent<BoxCollider2D>().bounds.extents.y);
+                RaycastHit2D canTeleport = Physics2D.Raycast(raycastOrigin, Vector2.right, 0.8f);
+                if (canTeleport.collider == null) {
+                    GetComponent<AudioSource>().PlayOneShot(teleSuccessSound);
+                    transform.Translate(new Vector3(dashIntervalLength, 0f,0f));
+                    canDash = false;
+                    canDashCooldown = false;
+                    StartCoroutine("dashCooldown");
+                } else {
+                    GetComponent<AudioSource>().PlayOneShot(teleFailureSound);
+                }
+                
             }
-            GetComponent<Rigidbody2D>().gravityScale = 0;
-            numIntervalsDashed = 0;
-            isDashing = true;
-            canDash = false;
-            canDashCooldown = false;
-            StartCoroutine("dashCooldown");
+            
         }
     }
+
     private void playerJump()
     {
         if (jumpsLeft > 0)
@@ -146,13 +168,7 @@ public class PlayerScript : MonoBehaviour {
         }
         if (Input.GetKeyDown(dashKeyCode))
         {
-            if(hasDashAbility)
-            {
-                playerDash();
-            } else
-            {
-                // TELEPORT
-            }
+            playerDash();
 
         }
         if(Input.GetKeyUp(moveRightKeyCode) && playerMoveX == horizontalSpeed)
