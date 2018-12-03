@@ -5,13 +5,14 @@ public class PlayerScript : MonoBehaviour {
     private float horizontalSpeed = 0.12f;
 
 
-    private float playerFallingSpeed;
-    private bool gravityPaused;
     private bool isGravityInverted;
 
+    private bool isFacingRight;
     private bool isDashing;
     private bool canDash;
     private bool canDashCooldown;
+    private bool hasDashAbility;
+    private bool hasJumpAbility;
     private bool isLanded;
     private int jumpsLeft;
     private float dashIntervalLength = 0.8f;
@@ -22,7 +23,7 @@ public class PlayerScript : MonoBehaviour {
     private KeyCode moveRightKeyCode = KeyCode.D;
     private KeyCode moveLeftKeyCode = KeyCode.A;
     private KeyCode fallDownKeyCode = KeyCode.S;
-    private KeyCode dashKeyCode = KeyCode.RightShift;
+    private KeyCode dashKeyCode = KeyCode.LeftShift;
     private float playerMoveX = 0;
     private float timeNoCollideWithGlass;
 
@@ -30,18 +31,26 @@ public class PlayerScript : MonoBehaviour {
     void Awake() {
         isDashing = false;
         jumpsLeft = 2;
-        playerFallingSpeed = 0f;
-        gravityPaused = false;
         isGravityInverted = false;
         canDash = true;
         canDashCooldown = true;
+        hasDashAbility = true;
+        hasJumpAbility = true;
+        isFacingRight = true;
     }
 
     
     private void playerDash()
     {
-        if(canDash && canDashCooldown)
+        if(canDash && canDashCooldown && hasDashAbility)
         {
+            if(isFacingRight)
+            {
+                dashIntervalLength = 0.8f;
+            } else
+            {
+                dashIntervalLength = -0.8f;
+            }
             GetComponent<Rigidbody2D>().gravityScale = 0;
             numIntervalsDashed = 0;
             isDashing = true;
@@ -59,11 +68,23 @@ public class PlayerScript : MonoBehaviour {
             jumpsLeft--;
         }
     }
+    private void invertGravity()
+    {
+        GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, GetComponent<Rigidbody2D>().velocity.y * -1);
+        if (isGravityInverted)
+        {
+            GetComponent<Rigidbody2D>().gravityScale = 1.5f;
+        } else
+        {
+            GetComponent<Rigidbody2D>().gravityScale = -1.5f;
+        }
+        isGravityInverted = !isGravityInverted;
+    }
     private void FixedUpdate()
     {
         if(!isDashing)
         {
-            Vector3 moveVector = new Vector3(playerMoveX, playerFallingSpeed, 0.0f);
+            Vector3 moveVector = new Vector3(playerMoveX, 0, 0);
             transform.Translate(moveVector);
         }
     }
@@ -83,23 +104,31 @@ public class PlayerScript : MonoBehaviour {
     void Update () {
 		if(Input.GetKeyDown(jumpKeyCode) || Input.GetKeyDown(altJump))
         {
-            Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
-            RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
-            if (detectGround.collider != null)
+            if(hasJumpAbility)
             {
-                jumpsLeft = 2;
+                Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
+                RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
+                if (detectGround.collider != null)
+                {
+                    jumpsLeft = 2;
+                }
+                playerJump();
+            } else
+            {
+
             }
-            playerJump();
         }
         if (Input.GetKey(moveRightKeyCode))
         {
             playerMoveX = horizontalSpeed;
             GetComponentInChildren<SpriteRenderer>().flipX = true;
+            isFacingRight = true;
         }
         if (Input.GetKey(moveLeftKeyCode))
         {
             playerMoveX = -horizontalSpeed;
             GetComponentInChildren<SpriteRenderer>().flipX = false;
+            isFacingRight = false;
         }
         if (Input.GetKey(moveLeftKeyCode) && Input.GetKey(moveRightKeyCode))
         {
@@ -117,7 +146,14 @@ public class PlayerScript : MonoBehaviour {
         }
         if (Input.GetKeyDown(dashKeyCode))
         {
-            playerDash();
+            if(hasDashAbility)
+            {
+                playerDash();
+            } else
+            {
+                // TELEPORT
+            }
+
         }
         if(Input.GetKeyUp(moveRightKeyCode) && playerMoveX == horizontalSpeed)
         {
