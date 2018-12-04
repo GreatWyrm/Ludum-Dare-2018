@@ -19,9 +19,11 @@ public class FinalAltar : MonoBehaviour {
 		PlayerScript ps = player.GetComponent<PlayerScript>();
 		if (Vector3.Distance(player.transform.position, transform.position) < 8f && !used) {
 			used = true;
-			
-			Debug.Log("Activated");
-			text.text = "Sacrificed EVERYTHING!";
+            ps.hasTeleportAbility = false;
+            ps.hasGravityAbility = false;
+            Debug.Log("Activated");
+            text.color = Color.cyan;
+            text.text = "Sacrificed EVERYTHING! You win!";
 
 		}
 		if (used)

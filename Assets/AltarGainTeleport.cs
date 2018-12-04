@@ -21,10 +21,11 @@ public class AltarGainTeleport : MonoBehaviour {
 			used = true;
 			ps.hasTeleportAbility = true;
 			Debug.Log("Activated");
-			canvas.GetComponent<Text>().text = "Granted teleport!";
-			canvas.GetComponent<TextFadeOut>().FadeOut();
+            canvas.GetComponentInChildren<Text>().color = Color.cyan;
+            canvas.GetComponentInChildren<Text>().text = "Granted teleport!";
+            canvas.GetComponentInChildren<Text>().GetComponent<TextFadeOut>().FadeOut();
 
-		}
+        }
 		if (used)
 		GetComponent<ParticleSystem>().Stop();
 	}

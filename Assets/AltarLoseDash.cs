@@ -21,8 +21,10 @@ public class AltarLoseDash : MonoBehaviour {
 			used = true;
 			ps.hasDashAbility = false;
 			Debug.Log("Activated");
-			canvas.GetComponent<Text>().text = "Sacrificed death!";
-			canvas.GetComponent<TextFadeOut>().FadeOut();
+            canvas.GetComponentInChildren<Text>().color = Color.cyan;
+
+            canvas.GetComponentInChildren<Text>().text = "Sacrificed dash!";
+			canvas.GetComponentInChildren<Text>().GetComponent<TextFadeOut>().FadeOut();
 		}
 		if (used)
 		GetComponent<ParticleSystem>().Stop();

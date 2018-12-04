@@ -21,10 +21,11 @@ public class AltarGainGravity : MonoBehaviour {
 			used = true;
 			ps.hasGravityAbility = true;
 			Debug.Log("Activated");
-			canvas.GetComponent<Text>().text = "Granted gravity switching!";
-			canvas.GetComponent<TextFadeOut>().FadeOut();
+            canvas.GetComponentInChildren<Text>().color = Color.cyan;
+            canvas.GetComponentInChildren<Text>().text = "Granted gravity switching!";
+            canvas.GetComponentInChildren<Text>().GetComponent<TextFadeOut>().FadeOut();
 
-		}
+        }
 		if (used)
 		GetComponent<ParticleSystem>().Stop();
 	}

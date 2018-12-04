@@ -21,10 +21,10 @@ public class AltarLoseJump : MonoBehaviour {
 			used = true;
 			ps.hasJumpAbility = false;
 			Debug.Log("Activated");
-			canvas.GetComponent<Text>().text = "Sacrificed Jump!";
-			canvas.GetComponent<TextFadeOut>().FadeOut();
-
-		}
+            canvas.GetComponentInChildren<Text>().color = Color.cyan;
+            canvas.GetComponentInChildren<Text>().text = "Sacrificed Jump!";
+            canvas.GetComponentInChildren<Text>().GetComponent<TextFadeOut>().FadeOut();
+        }
 		if (used)
 		GetComponent<ParticleSystem>().Stop();
 	}
