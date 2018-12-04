@@ -17,8 +17,10 @@ public class CameraScript : MonoBehaviour
 
     // LateUpdate is called after Update each frame
     void LateUpdate()
-    {
+    {   
+
+        Vector3 lookdir = player.GetComponent<PlayerScript>().isFacingRight ? new Vector3(6f, 0f, 0f) : new Vector3(-6f, 0f, 0f);
         // Set the position of the camera's transform to be the same as the player's, but offset by the calculated offset distance.
-        transform.position = player.transform.position + offset;
+        transform.position = Vector3.Lerp(transform.position, player.transform.position + offset + lookdir, 0.1f);
     }
 }

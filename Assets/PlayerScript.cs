@@ -8,13 +8,14 @@ public class PlayerScript : MonoBehaviour
 
     private bool isGravityInverted;
 
-    private bool isFacingRight;
+    public bool isFacingRight;
     private bool isDashing;
     private bool canDash;
     private bool canDashCooldown;
-    private bool hasDashAbility;
-    private bool hasTeleportAbility;
-    private bool hasJumpAbility;
+    public bool hasDashAbility;
+    public bool hasTeleportAbility;
+    public bool hasJumpAbility;
+    public bool hasGravityAbility;
     private bool isLanded;
     private int jumpsLeft;
     private float dashIntervalLength = 0.8f;
@@ -38,8 +39,9 @@ public class PlayerScript : MonoBehaviour
         isGravityInverted = false;
         canDash = true;
         canDashCooldown = true;
-        hasDashAbility = false;
-        hasTeleportAbility = true;
+        hasDashAbility = true;
+        hasTeleportAbility = false;
+        hasGravityAbility = false;
         hasJumpAbility = true;
         isFacingRight = true;
     }
@@ -92,16 +94,21 @@ public class PlayerScript : MonoBehaviour
 
     private void playerJump()
     {
-        if (jumpsLeft > 0)
+        if (hasJumpAbility) {
+if (jumpsLeft > 0)
         {
             GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
             GetComponent<Rigidbody2D>().AddForce(new Vector2(0, 13f), ForceMode2D.Impulse);
             jumpsLeft--;
         }
+        } 
+        
+        
     }
     private void invertGravity()
     {
-        GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, GetComponent<Rigidbody2D>().velocity.y * -1);
+        isGravityInverted = !isGravityInverted;
+        //GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, GetComponent<Rigidbody2D>().velocity.y * -1);
         if (isGravityInverted)
         {
             GetComponent<Rigidbody2D>().gravityScale = 1.5f;
@@ -110,7 +117,7 @@ public class PlayerScript : MonoBehaviour
         {
             GetComponent<Rigidbody2D>().gravityScale = -1.5f;
         }
-        isGravityInverted = !isGravityInverted;
+        
     }
     private void FixedUpdate()
     {
@@ -162,8 +169,9 @@ public class PlayerScript : MonoBehaviour
         {
             if (hasJumpAbility)
             {
-                Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y);
-                RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f);
+                float factor = Mathf.Sign(GetComponent<Rigidbody2D>().gravityScale);
+                Vector2 bottomOfPlayer = new Vector2(transform.position.x, transform.position.y - GetComponent<BoxCollider2D>().bounds.extents.y * factor);
+                RaycastHit2D detectGround = Physics2D.Raycast(bottomOfPlayer, Vector2.down, 0.4f * factor);
                 if (detectGround.collider != null)
                 {
                     jumpsLeft = 2;
@@ -172,7 +180,10 @@ public class PlayerScript : MonoBehaviour
             }
             else
             {
-                // GRAVITY INVERT
+                if (hasGravityAbility) {
+            Debug.Log("reverse gravity guys :/");
+            invertGravity();
+        }
             }
         }
         if (Input.GetKey(moveRightKeyCode))

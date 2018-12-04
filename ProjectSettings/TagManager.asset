@@ -14,7 +14,7 @@ TagManager:
   - 
   - 
   - Glass Platform
-  - 
+  - Particles
   - 
   - 
   - 
@@ -38,6 +38,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Particles
+    uniqueID: 2197553931
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
